@@ -1,3 +1,5 @@
+//Trigger to populate email id of contacts associated with an account on account page (insert,update,delete)
+
 trigger UpdateAccountEmailBulk on Contact (after insert,after update,after delete) {
     String Em='';
     if(trigger.isInsert || trigger.isUpdate ){
