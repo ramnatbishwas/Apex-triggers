@@ -1,0 +1,36 @@
+trigger UpdateAccountEmailBulk on Contact (after insert,after update,after delete) {
+    String Em='';
+    if(trigger.isInsert || trigger.isUpdate ){
+    Set <String> setId = New Set <String> ();
+    For (Contact con: Trigger.new) {
+        if (con.AccountId != Null ) {
+        setId.add (con.AccountId);
+        }
+    }
+   
+    if (setId.size ()> 0) {
+        List <Account> upAccList = new List <Account> ();
+       
+      for(Account acc : [Select id, Email__c,
+                             (Select Id, Email From Contacts)
+                        From Account Where Id In : setId])
+  
+       for(Contact con : acc.contacts)
+       {
+        if(con.Email != null)
+        {
+            Em =con.Email + ',' + Em;
+        }
+        acc.EmailAddresses__c = Em.removeEnd(',');
+       
+     upAccList.add(acc);
+   }   
+   //update upAccList;
+  // Set<Account> con = new Set<Account>(upAccList); // you can also use list elements in the set and then again convert it into set to avoid the duplicate values and then finally update the list
+   //List<Account> conL = new List<Account>(con);
+    Map<id,Account> mapContact = new Map<Id,Account>();
+        mapContact.putAll(upAccList);
+    update mapContact.values();
+}
+    }
+}
