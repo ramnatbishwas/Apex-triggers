@@ -1,0 +1,33 @@
+Description
+Lists can hold duplicate values, but if it contains duplicate sObject IDs and you try to update or delete you'll get the error : 'System.ListException: Duplicate id in list'
+
+Resolution
+Create a map of <id,sobject>
+Convert the list to Map so that the duplicate IDs are removed.
+Update or Delete the values part of the Map.
+
+Sample code 
+
+// pick up any id from your salesforce org, in this sample it is account id. 
+id aid = '0017F000002WkkdQAC';
+
+list <account> al = new list <account>();
+
+for(account a : [select id from account where id ='0017F000002WkkdQAC']){
+	account acc = new account(id = aid);
+    al.add(a);
+    al.add(acc);
+}
+//create a map that will hold the values of the list 
+map<id,account> accmap = new map<id,account>();
+
+//put all the values from the list to map. 
+accmap.putall(al);
+if(accmap.size()>0){
+update accmap.values();
+}
+List Class
+Map Class
+Disclaimer: This is one way of resolving the error and it is not the only way. Please use your discretion and test it in sandbox before deploying to production. 
+
+
