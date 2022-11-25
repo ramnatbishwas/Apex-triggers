@@ -1,0 +1,20 @@
+//https://developer.salesforce.com/forums/?id=906F0000000kDzOIAU
+//Trigger help to limit Number of cases to be created in a month per user
+
+trigger CaseTrigger on Case (before insert) {
+    if(Trigger.IsInsert && Trigger.isBefore)
+    	CaseTriggerHandler.limitNoOfCases(Trigger.New);    
+}
+
+public class CaseTriggerHandler {
+    public static void LimitNoOfCases(List<Case> caseList) {
+        Integer monthNumber = Date.Today().Month();
+        Integer yearNumber = Date.Today().Year();
+        Integer maxCases = 10;
+        List<Case> thisMonthCaseList = [select id,CreatedById,CreatedDate from case where CALENDAR_YEAR(CreatedDate) =:YearNumber and 
+        CALENDAR_MONTH(CreatedDate)=:monthnumber and CreatedById=:UserInfo.GetUserId()];
+        
+        if (thisMonthCaseList.Size()>=maxCases)         
+            caseList[0].addError('Dear user you have exceeded the maximum number of cases allowed this month.');
+    }
+}
