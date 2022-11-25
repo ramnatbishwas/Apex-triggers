@@ -1,0 +1,14 @@
+//Contact trigger to limit an account to not have more than 2 contacts
+Trigger BlockMoreThan2ContactOnAccount on Contact (after insert, after update, after undelete) {
+  Set<Id> setId = new Set<Id>();
+  for(Contact con: Trigger.new) {
+    setId.add(con.AccountId);
+  }
+  setId.remove(null);
+  Set<Id> morethan2Contacts = new Map<Id, AggregateResult>([SELECT AccountId Id FROM Contact WHERE AccountId = :setId GROUP BY AccountId HAVING COUNT(Id) > 2]).keySet();
+  for(Contact con: Trigger.new) {
+    if(moreThan2Contacts.contains(con.AccountId)) {
+      con.AccountId.addError('You may not have more than 2 contacts per account.');
+    }
+  }
+}
